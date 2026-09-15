@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:projectlens_desktop/ui/screens/register_screen.dart';
-import 'ui/screens/login_screen.dart'; // Importe ton écran de connexion
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // 1. Importe Riverpod
+import 'features/auth/presentation/screens/register_screen.dart';
+// import 'ui/screens/login_screen.dart'; // Décommente si besoin
 
 void main() {
-  runApp(const MyApp());
+  // 2. Enveloppe runApp avec ProviderScope pour activer la gestion d'état
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
         useMaterial3: true,
       ),
-      // Définis le LoginScreen comme premier écran au démarrage
+      // Définis le premier écran au démarrage
       home: const RegisterScreen(),
     );
   }
