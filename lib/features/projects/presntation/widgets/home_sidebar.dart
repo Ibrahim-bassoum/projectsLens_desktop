@@ -1,203 +1,201 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-// Importe ton provider de projets (chemin à adapter selon ton arborescence)
-import '../providers/project_provider.dart';
 
-class HomeSidebar extends ConsumerWidget {
+class HomeSidebar extends StatelessWidget {
   final String userName;
   final String userEmail;
+  final String currentRoute; // Pour gérer l'onglet actif
+  final Function(String) onNavItemSelected; // Callback pour changer de page
 
   const HomeSidebar({
     super.key,
     required this.userName,
     required this.userEmail,
+    this.currentRoute = 'Tableau de bord',
+    required this.onNavItemSelected,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // On écoute le provider de projets
-    final projectsAsync = ref.watch(projectProvider);
-
+  Widget build(BuildContext context) {
     return Container(
       width: 260,
-      color: Colors.white,
-      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          right: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Logo
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'P',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'ProjectLens',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
-
-          // Menu Dashboard
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Row(
+          // 1. Logo / En-tête
+          Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Row(
               children: [
-                Icon(Icons.dashboard, size: 20, color: Colors.black),
-                SizedBox(width: 12),
-                Text(
-                  'Dashboard',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
                     color: Colors.black,
+                    borderRadius: BorderRadius.circular(6),
                   ),
+                  child: const Text(
+                    'P',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  'ProjectLens',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 30),
 
-          // Section Projets récents
-          const Text(
-            'PROJETS RÉCENTS',
-            style: TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 10),
-
-          // Affichage dynamique géré par Riverpod
+          // 2. Liste des menus de navigation
           Expanded(
-            child: projectsAsync.when(
-              data: (projects) {
-                if (projects.isEmpty) {
-                  return const Text(
-                    'Aucun projet pour le moment',
-                    style: TextStyle(color: Colors.grey, fontSize: 11),
-                  );
-                }
-                return ListView.builder(
-                  itemCount: projects.length,
-                  itemBuilder: (context, index) {
-                    final project = projects[index];
-                    // Adapte les clés selon le format JSON renvoyé par ton API (ex: 'name', 'updated_at')
-                    return _buildSidebarItem(
-                      project['name'] ?? 'Projet sans nom',
-                      'Analysé récemment',
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              children: [
+                _buildNavItem(
+                  icon: Icons.grid_view_rounded,
+                  label: 'Tableau de bord',
                 ),
-              ),
-              error: (err, stack) => Text(
-                'Erreur de chargement',
-                style: TextStyle(color: Colors.red.shade300, fontSize: 11),
-              ),
+                _buildNavItem(
+                  icon: Icons.folder_outlined,
+                  label: 'Mes projets',
+                ),
+                _buildNavItem(
+                  icon: Icons.upload_file_outlined,
+                  label: 'Importer un projet',
+                ),
+                _buildNavItem(
+                  icon: Icons.analytics_outlined,
+                  label: 'Analyses',
+                ),
+                _buildNavItem(
+                  icon: Icons.description_outlined,
+                  label: 'Documentation',
+                ),
+                _buildNavItem(
+                  icon: Icons.account_tree_outlined,
+                  label: 'Diagrammes UML',
+                ),
+                _buildNavItem(
+                  icon: Icons.auto_awesome_outlined,
+                  label: 'Assistant IA',
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Divider(color: Color(0xFFE2E8F0), height: 1),
+                ),
+                _buildNavItem(
+                  icon: Icons.history_outlined,
+                  label: 'Historique',
+                ),
+                _buildNavItem(
+                  icon: Icons.settings_outlined,
+                  label: 'Paramètres',
+                ),
+              ],
             ),
           ),
 
-          // Profil utilisateur bas de page
-          Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.grey.shade200,
-                child: Text(
-                  userName.isNotEmpty
-                      ? userName.substring(0, 2).toUpperCase()
-                      : 'JD',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+          // 3. Profil utilisateur en bas (identique à la maquette)
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 18,
+                  backgroundColor: Colors.grey.shade200,
+                  child: Text(
+                    userName.isNotEmpty
+                        ? userName.substring(0, 2).toUpperCase()
+                        : 'JD',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      userName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        userName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    Text(
-                      userEmail,
-                      style: const TextStyle(color: Colors.grey, fontSize: 11),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                      Text(
+                        userEmail,
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 11,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                IconButton(
+                  icon: const Icon(
+                    Icons.logout_rounded,
+                    size: 18,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    // Action de déconnexion ici
+                  },
+                  tooltip: 'Déconnexion',
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSidebarItem(String title, String subtitle) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        children: [
-          const Icon(Icons.folder_outlined, size: 18, color: Colors.grey),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 13,
-                    color: Colors.black,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(color: Colors.grey, fontSize: 10),
-                ),
-              ],
-            ),
+  // Widget helper pour construire chaque ligne de navigation de manière propre
+  Widget _buildNavItem({required IconData icon, required String label}) {
+    final bool isSelected = currentRoute == label;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        color: isSelected ? const Color(0xFFF1F5F9) : Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          size: 20,
+          color: isSelected ? Colors.black : Colors.grey.shade600,
+        ),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            fontSize: 13,
+            color: isSelected ? Colors.black : Colors.grey.shade700,
           ),
-        ],
+        ),
+        dense: true,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        onTap: () => onNavItemSelected(label),
       ),
     );
   }

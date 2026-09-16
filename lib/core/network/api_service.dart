@@ -136,4 +136,42 @@ class ApiService {
       );
     }
   }
+
+  Future<Map<String, dynamic>> getUserProfile() async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.get(
+      Uri.parse(
+        '$baseUrl/auth/me',
+      ), // Adapte l'URL selon ton endpoint Spring Boot
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Impossible de charger le profil utilisateur');
+    }
+  }
+
+  // ==================== 5. STATISTIQUES ====================
+
+  Future<Map<String, dynamic>> getDashboardStats() async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/dashboard/stats'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception(
+        'Impossible de charger les statistiques : ${response.body}',
+      );
+    }
+  }
 }
