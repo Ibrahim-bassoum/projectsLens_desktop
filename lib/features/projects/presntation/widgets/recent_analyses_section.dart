@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class RecentAnalysesSection extends StatelessWidget {
   final List<dynamic> projects;
+  final VoidCallback? onViewAllPressed; // <--- Ajouté ici
 
-  const RecentAnalysesSection({super.key, required this.projects});
+  const RecentAnalysesSection({
+    super.key,
+    required this.projects,
+    this.onViewAllPressed, // <--- Rendu optionnel dans le constructeur
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,8 @@ class RecentAnalysesSection extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed:
+                          onViewAllPressed, // <--- Branché ici sur le bouton "Voir tout"
                       child: const Text(
                         'Voir tout →',
                         style: TextStyle(fontSize: 12, color: Colors.black54),
