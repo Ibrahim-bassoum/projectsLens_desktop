@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+// Importe ton écran de documents (adapte le chemin selon ton arborescence)
+import '../../../documents/presentation/screens/project_documents_screen.dart';
 
 class RecentAnalysesSection extends StatelessWidget {
   final List<dynamic> projects;
-  final VoidCallback? onViewAllPressed; // <--- Ajouté ici
+  final VoidCallback? onViewAllPressed;
 
   const RecentAnalysesSection({
     super.key,
     required this.projects,
-    this.onViewAllPressed, // <--- Rendu optionnel dans le constructeur
+    this.onViewAllPressed,
   });
 
   @override
@@ -39,8 +41,7 @@ class RecentAnalysesSection extends StatelessWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed:
-                          onViewAllPressed, // <--- Branché ici sur le bouton "Voir tout"
+                      onPressed: onViewAllPressed,
                       child: const Text(
                         'Voir tout →',
                         style: TextStyle(fontSize: 12, color: Colors.black54),
@@ -111,70 +112,75 @@ class RecentAnalysesSection extends StatelessWidget {
                         ],
                       )
                     else
-                      ...projects
-                          .take(4)
-                          .map(
-                            (p) => TableRow(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
+                      ...projects.take(4).map((p) {
+                        final projectId = p['id'].toString();
+                        final projectName = p['name'] ?? 'Projet sans nom';
+
+                        return TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Row(
+                                children: [
+                                  const Icon(
+                                    Icons.code,
+                                    size: 16,
+                                    color: Colors.black87,
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.code,
-                                        size: 16,
-                                        color: Colors.black87,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        p['name'] ?? 'Projet sans nom',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                  child: Text(
-                                    p['repoUrl'] ?? '',
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    projectName,
                                     style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                  ),
-                                  child: OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 0,
-                                      ),
-                                      minimumSize: const Size(0, 30),
-                                    ),
-                                    onPressed: () {
-                                      // Action pour analyser ou voir les détails du projet
-                                    },
-                                    child: const Text(
-                                      'Explorer',
-                                      style: TextStyle(fontSize: 11),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              child: Text(
+                                p['repoUrl'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 0,
+                                  ),
+                                  minimumSize: const Size(0, 30),
+                                ),
+                                onPressed: () {
+                                  // Navigation vers les documents du projet au clic sur "Explorer"
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ProjectDocumentsScreen(
+                                            projectId: projectId,
+                                            projectName: projectName,
+                                          ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  'Explorer',
+                                  style: TextStyle(fontSize: 11),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                   ],
                 ),
               ],
@@ -183,7 +189,7 @@ class RecentAnalysesSection extends StatelessWidget {
         ),
         const SizedBox(width: 20),
 
-        // Documents générés (Statique en attendant le module de génération)
+        // Documents générés
         Expanded(
           flex: 4,
           child: Container(

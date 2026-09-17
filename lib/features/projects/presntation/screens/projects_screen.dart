@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 // Importe ton provider ici (adapte le chemin selon ton arborescence)
 import '../providers/project_provider.dart';
+import '../../../documents/presentation/screens/project_documents_screen.dart';
 
 class ProjectsScreen extends ConsumerStatefulWidget {
   const ProjectsScreen({super.key});
@@ -42,9 +43,7 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                 ],
               ),
               ElevatedButton.icon(
-                onPressed: () {
-                  // TODO: Ouvrir la modale d'importation (Git ou ZIP)
-                },
+                onPressed: () {},
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Importer un projet'),
                 style: ElevatedButton.styleFrom(
@@ -119,6 +118,17 @@ class _ProjectsScreenState extends ConsumerState<ProjectsScreen> {
                       final projectId = project['id'].toString();
 
                       return ListTile(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProjectDocumentsScreen(
+                                projectId: projectId,
+                                projectName: project['name'] ?? 'Projet',
+                              ),
+                            ),
+                          );
+                        },
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(

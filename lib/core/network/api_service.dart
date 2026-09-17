@@ -174,4 +174,80 @@ class ApiService {
       );
     }
   }
+
+  // ==================== 6. DOCUMENTS GÉNÉRÉS (IA) ====================
+
+  // Récupérer la liste des documents d'un projet
+  Future<List<dynamic>> getProjectDocuments(String projectId) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/documents/project/$projectId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Impossible de charger les documents du projet');
+    }
+  }
+
+  // Mettre à jour un document
+  Future<void> updateDocument(String documentId, String newContent) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/documents/$documentId'),
+      headers: {'Authorization': 'Bearer $token', 'Content-Type': 'text/plain'},
+      body: newContent,
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Erreur lors de la mise à jour du document : ${response.body}',
+      );
+    }
+  }
+
+  // Supprimer un document
+  Future<void> deleteDocument(String documentId) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/documents/$documentId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Erreur lors de la suppression du document : ${response.body}',
+      );
+    }
+  }
+
+  // ==================== 7. CHAT IA CONTEXTUEL ====================
+
+  Future<String> sendChatMessage(String projectId, String message) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('Non authentifié');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/ai/chat/$projectId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'message': message}),
+    );
+
+    if (response.statusCode == 200) {
+      return response.body; // Retourne la réponse texte de l'IA
+    } else {
+      throw Exception('Erreur de chat IA : ${response.body}');
+    }
+  }
 }
