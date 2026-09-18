@@ -9,6 +9,7 @@ import '../widgets/analysis_form_card.dart';
 import '../widgets/stats_cards_row.dart';
 import '../widgets/recent_analyses_section.dart';
 import '../screens/projects_screen.dart';
+import '../screens/import_project_screen.dart'; // <--- Import du nouvel écran
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -77,6 +78,126 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  // Helper pour retourner la vue active
+  Widget _buildCurrentView(
+    List<dynamic> projects,
+    bool isLoading,
+    String firstName,
+  ) {
+    switch (_currentRoute) {
+      case 'Mes projets':
+        return ProjectsScreen(
+          onImportClick: () {
+            setState(() => _currentRoute = 'Importer un projet');
+          },
+        );
+
+      case 'Importer un projet':
+        return ImportProjectScreen(
+          onImportSuccess: () {
+            setState(() => _currentRoute = 'Mes projets');
+          },
+        );
+
+      case 'Tableau de bord':
+      default:
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // En-tête de bienvenue
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Bonjour, $firstName 👋',
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.w800,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        "Analysez, documentez et explorez l'architecture de vos projets.",
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF10B981),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${projects.length} projet${projects.length > 1 ? 's' : ''} actif${projects.length > 1 ? 's' : ''}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF334155),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 28),
+
+              // Carte d'analyse / Import Git
+              AnalysisFormCard(
+                urlController: _urlController,
+                nameController: _nameController,
+                isLoading: isLoading,
+                errorMessage: _errorMessage,
+                onSubmit: _startAnalysis,
+              ),
+              const SizedBox(height: 24),
+
+              // Statistiques globales
+              const StatsCardsRow(),
+              const SizedBox(height: 24),
+
+              // Section des projets récents
+              RecentAnalysesSection(
+                projects: projects,
+                onViewAllPressed: () {
+                  setState(() {
+                    _currentRoute = 'Mes projets';
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userAsync = ref.watch(userProvider);
@@ -95,7 +216,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: const Color(0xFFF8FAFC),
       body: Row(
         children: [
-          // 1. Sidebar de gauche identique à la preview
+          // 1. Sidebar de gauche dynamique
           HomeSidebar(
             userName: userName,
             userEmail: userEmail,
@@ -107,114 +228,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
 
-          // 2. Contenu principal dynamique
-          Expanded(
-            child: _currentRoute == 'Mes projets'
-                ? ProjectsScreen(
-                    onImportClick: () {
-                      setState(() => _currentRoute = 'Tableau de bord');
-                    },
-                  )
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 36,
-                      vertical: 32,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // En-tête de bienvenue
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Bonjour, $firstName 👋',
-                                  style: const TextStyle(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFF0F172A),
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                const Text(
-                                  "Analysez, documentez et explorez l'architecture de vos projets.",
-                                  style: TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF10B981),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${projects.length} projet${projects.length > 1 ? 's' : ''} actif${projects.length > 1 ? 's' : ''}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF334155),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 28),
-
-                        // Carte d'analyse / Import Git
-                        AnalysisFormCard(
-                          urlController: _urlController,
-                          nameController: _nameController,
-                          isLoading: isLoading,
-                          errorMessage: _errorMessage,
-                          onSubmit: _startAnalysis,
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Statistiques globales
-                        const StatsCardsRow(),
-                        const SizedBox(height: 24),
-
-                        // Section des projets récents
-                        RecentAnalysesSection(
-                          projects: projects,
-                          onViewAllPressed: () {
-                            setState(() {
-                              _currentRoute = 'Mes projets';
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-          ),
+          // 2. Contenu principal selon la route sélectionnée
+          Expanded(child: _buildCurrentView(projects, isLoading, firstName)),
         ],
       ),
     );
