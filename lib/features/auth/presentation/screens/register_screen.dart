@@ -19,6 +19,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   String? _error;
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _handleRegister() async {
     setState(() {
       _isLoading = true;
@@ -36,7 +44,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
@@ -44,7 +52,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       } else {
         final errorData = jsonDecode(response.body);
-        throw Exception(errorData['error'] ?? 'Erreur lors de l\'inscription');
+        throw Exception(
+          errorData['error'] ??
+              errorData['message'] ??
+              'Erreur lors de l\'inscription',
+        );
       }
     } catch (e) {
       setState(() {
@@ -65,32 +77,41 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: const Color(0xFFF8FAFC),
       body: LayoutBuilder(
         builder: (context, constraints) {
+          final isDesktop = constraints.maxWidth > 860;
           return Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 32.0,
+              ),
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxWidth: 1050,
-                  minHeight: constraints.maxHeight > 650
-                      ? 650
-                      : constraints.maxHeight * 0.8,
+                  maxWidth: 1040,
+                  minHeight: constraints.maxHeight > 660
+                      ? 640
+                      : constraints.maxHeight * 0.85,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.05),
+                        blurRadius: 30,
+                        offset: const Offset(0, 15),
+                      ),
+                      BoxShadow(
+                        color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: constraints.maxWidth > 800
+                    borderRadius: BorderRadius.circular(24),
+                    child: isDesktop
                         ? IntrinsicHeight(
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -99,11 +120,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   flex: 5,
                                   child: RegisterLeftBanner(),
                                 ),
+                                Container(
+                                  width: 1,
+                                  color: const Color(0xFFF1F5F9),
+                                ),
                                 Expanded(
-                                  flex: 5,
+                                  flex: 6,
                                   child: Center(
                                     child: SingleChildScrollView(
-                                      padding: const EdgeInsets.all(24.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 40.0,
+                                        vertical: 36.0,
+                                      ),
                                       child: RegisterForm(
                                         nameController: _nameController,
                                         emailController: _emailController,
@@ -119,10 +147,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           )
                         : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               const RegisterLeftBanner(),
                               Padding(
-                                padding: const EdgeInsets.all(24.0),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24.0,
+                                  vertical: 32.0,
+                                ),
                                 child: RegisterForm(
                                   nameController: _nameController,
                                   emailController: _emailController,

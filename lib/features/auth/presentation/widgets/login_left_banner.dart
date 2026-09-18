@@ -6,87 +6,210 @@ class LoginLeftBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
-        ),
-      ),
+      color: const Color(0xFFF8FAFC),
+      padding: const EdgeInsets.all(44),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  'P',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+              // Logo & Marque
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.call_split_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
                   ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ProjectLens',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      Text(
+                        'Espace de travail logiciel',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+              // Titre d'accroche principal
+              const Text(
+                'Visualisez, documentez et explorez vos projets logiciels en toute simplicité.',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0F172A),
+                  height: 1.25,
+                  letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(height: 12),
               const Text(
-                'ProjectLens',
+                'Une interface claire conçue pour vous apporter une compréhension immédiate de vos bases de code.',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black,
+                  fontSize: 13,
+                  color: Color(0xFF475569),
+                  height: 1.5,
                 ),
+              ),
+              const SizedBox(height: 32),
+
+              // 3 Features de la preview
+              _buildFeature(
+                icon: Icons.hub_outlined,
+                title: 'Cartographie claire',
+                subtitle:
+                    "Repérez instantanément les dépendances et l'architecture.",
+              ),
+              const SizedBox(height: 18),
+              _buildFeature(
+                icon: Icons.description_outlined,
+                title: 'Documentation fluide',
+                subtitle: 'Génération propre de guides et diagrammes lisibles.',
+              ),
+              const SizedBox(height: 18),
+              _buildFeature(
+                icon: Icons.verified_user_outlined,
+                title: 'Sécurité intégrale',
+                subtitle:
+                    'Vos dépôts et codes restent entièrement confidentiels.',
               ),
             ],
           ),
-          const SizedBox(height: 35),
-          const Text(
-            'Bon retour parmi\nnous !',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-              height: 1.2,
+
+          // Badge Client de bureau (comme dans la preview)
+          Container(
+            margin: const EdgeInsets.only(top: 36),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Connectez-vous pour retrouver vos analyses de code, vos rapports d\'architecture et votre assistant IA.',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 12,
-              height: 1.5,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.laptop_mac_rounded,
+                        size: 18,
+                        color: Color(0xFF334155),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Client de bureau épuré',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        Text(
+                          'Expérience fluide, rapide et sans distraction',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF10B981),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 40),
-          _buildInfoRow(Icons.bolt, 'Reprenez vos analyses en un clic'),
-          const SizedBox(height: 16),
-          _buildInfoRow(
-            Icons.auto_awesome,
-            'Consultez vos documentations générées',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String text) {
+  Widget _buildFeature({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 18, color: Colors.black87),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: const TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
-            fontSize: 12,
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Icon(icon, size: 16, color: const Color(0xFF334155)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF64748B),
+                  height: 1.3,
+                ),
+              ),
+            ],
           ),
         ),
       ],

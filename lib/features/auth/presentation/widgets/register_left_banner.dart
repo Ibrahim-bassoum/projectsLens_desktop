@@ -6,151 +6,215 @@ class RegisterLeftBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(16),
-          bottomLeft: Radius.circular(16),
-        ),
-      ),
+      color: const Color(0xFFF8FAFC),
+      padding: const EdgeInsets.all(44),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black,
-                  borderRadius: BorderRadius.circular(8),
+              // Logo P noir & Titre
+              Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        'P',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ProjectLens',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: Color(0xFF0F172A),
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      Text(
+                        "L'espace de clarté logicielle",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF64748B),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 40),
+
+              // Titre d'accroche
+              const Text(
+                'Comprenez vos architectures en un coup d\'œil.',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF0F172A),
+                  height: 1.25,
+                  letterSpacing: -0.5,
                 ),
-                child: const Text(
-                  'P',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'ProjectLens unifie la vision de vos bases de code pour transformer la complexité en clarté, de la conception au déploiement.',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF475569),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Carte "Cartographie vivante" avec barre de progression
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 16,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Cartographie vivante',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'Automatisé',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Diagrammes interactifs, flux de données clairs et navigation fluide dans vos composants sans effort.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Barre de progression
+                    Container(
+                      height: 6,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 0.6,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          // Témoignage bas de page
+          Container(
+            margin: const EdgeInsets.only(top: 36),
+            padding: const EdgeInsets.only(left: 14),
+            decoration: const BoxDecoration(
+              border: Border(
+                left: BorderSide(color: Color(0xFFCBD5E1), width: 2),
+              ),
+            ),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '« La façon la plus naturelle et élégante de documenter et explorer nos systèmes. »',
                   style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                    color: Color(0xFF475569),
+                    height: 1.4,
                   ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'ProjectLens',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black,
+                SizedBox(height: 4),
+                Text(
+                  '— Équipe Architecture Produit',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F172A),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 35),
-          const Text(
-            'Analysez. Comprenez.\nGénérez.',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-              height: 1.2,
+              ],
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'ProjectLens est la plateforme intelligente qui analyse vos projets logiciels et génère une documentation complète grâce à l\'intelligence artificielle.',
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 12,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 30),
-          _buildFeatureRow(
-            Icons.code,
-            'Analyse de code',
-            'Détectez les technologies, l\'architecture et la structure de votre projet.',
-          ),
-          const SizedBox(height: 20),
-          _buildFeatureRow(
-            Icons.description_outlined,
-            'Documentation automatique',
-            'Générez un README, une documentation API, des diagrammes et bien plus.',
-          ),
-          const SizedBox(height: 20),
-          _buildFeatureRow(
-            Icons.chat_bubble_outline,
-            'Assistant IA',
-            'Posez vos questions et obtenez des réponses précises sur votre code.',
-          ),
-          const SizedBox(height: 40),
-          Row(
-            children: [
-              Icon(Icons.security, size: 14, color: Colors.grey.shade500),
-              const SizedBox(width: 6),
-              Text(
-                'Sécurisé',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
-              ),
-              const SizedBox(width: 24),
-              Icon(Icons.bolt, size: 14, color: Colors.grey.shade500),
-              const SizedBox(width: 6),
-              Text(
-                'Rapide',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
-              ),
-              const SizedBox(width: 24),
-              Icon(Icons.cloud_outlined, size: 14, color: Colors.grey.shade500),
-              const SizedBox(width: 6),
-              Text(
-                'Accessible partout',
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
-              ),
-            ],
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildFeatureRow(IconData icon, String title, String subtitle) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade200),
-          ),
-          child: Icon(icon, size: 18, color: Colors.black87),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
