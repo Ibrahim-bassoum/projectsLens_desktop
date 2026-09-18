@@ -23,103 +23,170 @@ class AnalysisFormCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Analyser un nouveau projet',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const Text(
-            'Importez un dépôt GitHub pour générer sa documentation',
-            style: TextStyle(color: Colors.grey, fontSize: 13),
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.hub_outlined,
+                  size: 17,
+                  color: Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Analyser un nouveau projet via Git',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  Text(
+                    'Importez un dépôt GitHub ou GitLab pour cartographier et documenter votre code.',
+                    style: TextStyle(color: Color(0xFF64748B), fontSize: 12),
+                  ),
+                ],
+              ),
+            ],
           ),
           const SizedBox(height: 20),
 
-          // Champs URL et Nom du Projet (adaptés en Wrap ou Row flexible pour éviter l'overflow)
+          // Ligne des champs et bouton
           Row(
             children: [
+              // URL du dépôt
               Expanded(
-                flex: 2,
+                flex: 3,
                 child: TextField(
                   controller: urlController,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF0F172A),
+                  ),
                   decoration: InputDecoration(
-                    hintText: 'https://github.com/username/repository',
+                    hintText: 'https://github.com/utilisateur/mon-projet',
                     hintStyle: const TextStyle(
-                      color: Colors.grey,
+                      color: Color(0xFF94A3B8),
                       fontSize: 13,
                     ),
                     prefixIcon: const Icon(
-                      Icons.link,
-                      color: Colors.grey,
+                      Icons.link_rounded,
+                      color: Color(0xFF94A3B8),
                       size: 18,
                     ),
+                    filled: true,
+                    fillColor: const Color(0xFFF8FAFC),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                      horizontal: 14,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF0F172A),
+                        width: 1.5,
+                      ),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 12),
+
+              // Nom du projet
               Expanded(
-                flex: 1,
+                flex: 2,
                 child: TextField(
                   controller: nameController,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF0F172A),
+                  ),
                   decoration: InputDecoration(
-                    hintText: 'Nom du projet',
+                    hintText: 'Nom du projet (ex: MonProjet)',
                     hintStyle: const TextStyle(
-                      color: Colors.grey,
+                      color: Color(0xFF94A3B8),
                       fontSize: 13,
                     ),
+                    filled: true,
+                    fillColor: const Color(0xFFF8FAFC),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 13,
+                      horizontal: 14,
+                    ),
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 14,
-                      horizontal: 12,
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        color: Color(0xFF0F172A),
+                        width: 1.5,
+                      ),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 15),
+              const SizedBox(width: 12),
+
+              // Bouton d'analyse
               SizedBox(
-                height: 48,
+                height: 46,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   onPressed: isLoading ? null : onSubmit,
                   child: isLoading
                       ? const SizedBox(
-                          width: 20,
-                          height: 20,
+                          width: 18,
+                          height: 18,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             color: Colors.white,
                           ),
                         )
                       : const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Analyser le projet',
@@ -131,7 +198,7 @@ class AnalysisFormCard extends StatelessWidget {
                             ),
                             SizedBox(width: 8),
                             Icon(
-                              Icons.arrow_forward,
+                              Icons.arrow_forward_rounded,
                               size: 16,
                               color: Colors.white,
                             ),
@@ -141,11 +208,33 @@ class AnalysisFormCard extends StatelessWidget {
               ),
             ],
           ),
+
           if (errorMessage != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              errorMessage!,
-              style: const TextStyle(color: Colors.redAccent, fontSize: 12),
+            const SizedBox(height: 14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF1F2),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFECDD3)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: 15,
+                    color: Color(0xFFBE123C),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    errorMessage!,
+                    style: const TextStyle(
+                      color: Color(0xFFBE123C),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ],

@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/stats_provider.dart'; // Adapte le chemin selon ton arborescence
+import '../providers/stats_provider.dart';
 
 class StatsCardsRow extends ConsumerWidget {
   const StatsCardsRow({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // On écoute le provider des statistiques
     final statsAsync = ref.watch(statsProvider);
 
     return statsAsync.when(
       data: (stats) {
-        // Extraction des données reçues du backend Spring Boot
         final totalProjects = stats['totalProjects']?.toString() ?? '0';
         final totalFiles = stats['totalFiles']?.toString() ?? '0';
 
@@ -21,24 +19,33 @@ class StatsCardsRow extends ConsumerWidget {
             _buildStatCard(
               'Projets analysés',
               totalProjects,
-              'Actifs',
-              Icons.code,
-            ),
-            const SizedBox(width: 15),
-            _buildStatCard(
-              'Fichiers analysés',
-              totalFiles,
               'Enregistrés',
-              Icons.folder,
+              Icons.folder_outlined,
+              const Color(0xFF2563EB),
             ),
-            const SizedBox(width: 15),
-            _buildStatCard('Lignes de code', 'Estimé', 'N/A', Icons.layers),
-            const SizedBox(width: 15),
+            const SizedBox(width: 16),
             _buildStatCard(
-              'Temps gagné',
+              'Fichiers indexés',
+              totalFiles,
+              'Code source',
+              Icons.insert_drive_file_outlined,
+              const Color(0xFF059669),
+            ),
+            const SizedBox(width: 16),
+            _buildStatCard(
+              'Composants & AST',
+              'Actifs',
+              'Tree-Sitter',
+              Icons.account_tree_outlined,
+              const Color(0xFF7C3AED),
+            ),
+            const SizedBox(width: 16),
+            _buildStatCard(
+              'Temps de synthèse',
               '${(int.tryParse(totalProjects) ?? 0) * 2}h',
-              'Total',
-              Icons.access_time,
+              'Gagnées',
+              Icons.access_time_rounded,
+              const Color(0xFFD97706),
             ),
           ],
         );
@@ -49,29 +56,26 @@ class StatsCardsRow extends ConsumerWidget {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.all(20.0),
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
         ],
       ),
-      error: (err, stack) => Row(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: Text(
-                'Erreur de chargement des stats',
-                style: TextStyle(color: Colors.red.shade400, fontSize: 12),
-              ),
-            ),
-          ),
-        ],
+      error: (err, stack) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: const Color(0xFFFECDD3)),
+        ),
+        child: Text(
+          'Impossible de charger les statistiques : $err',
+          style: const TextStyle(color: Color(0xFFBE123C), fontSize: 12),
+        ),
       ),
     );
   }
@@ -79,16 +83,24 @@ class StatsCardsRow extends ConsumerWidget {
   Widget _buildStatCard(
     String title,
     String value,
-    String subtext,
+    String badgeText,
     IconData icon,
+    Color accentColor,
   ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,27 +110,39 @@ class StatsCardsRow extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-                Icon(icon, size: 18, color: Colors.grey),
+                Icon(icon, size: 18, color: accentColor),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
             Text(
               value,
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
+                fontSize: 24,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0F172A),
+                letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 5),
-            Text(
-              subtext,
-              style: const TextStyle(
-                color: Colors.green,
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
+            const SizedBox(height: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                badgeText,
+                style: const TextStyle(
+                  color: Color(0xFF475569),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],

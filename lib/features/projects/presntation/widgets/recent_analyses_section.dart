@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// Importe ton écran de documents (adapte le chemin selon ton arborescence)
 import '../../../documents/presentation/screens/project_documents_screen.dart';
 
 class RecentAnalysesSection extends StatelessWidget {
@@ -17,15 +16,22 @@ class RecentAnalysesSection extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Tableau des Projets récents dynamiques
+        // Tableau des Projets récents
         Expanded(
           flex: 6,
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,59 +42,92 @@ class RecentAnalysesSection extends StatelessWidget {
                     const Text(
                       'Projets récents',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
                     TextButton(
                       onPressed: onViewAllPressed,
-                      child: const Text(
-                        'Voir tout →',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        visualDensity: VisualDensity.compact,
+                      ),
+                      child: const Row(
+                        children: [
+                          Text(
+                            'Voir tout',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 Table(
                   columnWidths: const {
-                    0: FlexColumnWidth(3),
+                    0: FlexColumnWidth(4),
                     1: FlexColumnWidth(3),
                     2: FlexColumnWidth(2),
                   },
                   children: [
                     const TableRow(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Color(0xFFF1F5F9),
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
                       children: [
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.only(bottom: 12),
                           child: Text(
-                            'Nom du projet',
+                            'NOM DU PROJET',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: Color(0xFF94A3B8),
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.only(bottom: 12),
                           child: Text(
-                            'Dépôt Git',
+                            'DÉPÔT GIT',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: Color(0xFF94A3B8),
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.only(bottom: 12),
                           child: Text(
-                            'Action',
+                            'ACTION',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: Color(0xFF94A3B8),
                               fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
@@ -98,12 +137,12 @@ class RecentAnalysesSection extends StatelessWidget {
                       const TableRow(
                         children: [
                           Padding(
-                            padding: EdgeInsets.all(12),
+                            padding: EdgeInsets.symmetric(vertical: 24),
                             child: Text(
-                              'Aucun projet récent',
+                              'Aucun projet importé pour le moment.',
                               style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                                fontSize: 13,
+                                color: Color(0xFF64748B),
                               ),
                             ),
                           ),
@@ -112,69 +151,100 @@ class RecentAnalysesSection extends StatelessWidget {
                         ],
                       )
                     else
-                      ...projects.take(4).map((p) {
+                      ...projects.take(5).map((p) {
                         final projectId = p['id'].toString();
                         final projectName = p['name'] ?? 'Projet sans nom';
+                        final repoUrl = p['repoUrl'] ?? '';
 
                         return TableRow(
+                          decoration: const BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Color(0xFFF8FAFC)),
+                            ),
+                          ),
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               child: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.code,
-                                    size: 16,
-                                    color: Colors.black87,
+                                  Container(
+                                    width: 30,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF1F5F9),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.code_rounded,
+                                      size: 16,
+                                      color: Color(0xFF0F172A),
+                                    ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    projectName,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      projectName,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                        color: Color(0xFF0F172A),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               child: Text(
-                                p['repoUrl'] ?? '',
+                                repoUrl,
                                 style: const TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: Color(0xFF64748B),
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 0,
-                                  ),
-                                  minimumSize: const Size(0, 30),
-                                ),
-                                onPressed: () {
-                                  // Navigation vers les documents du projet au clic sur "Explorer"
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          ProjectDocumentsScreen(
-                                            projectId: projectId,
-                                            projectName: projectName,
-                                          ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 6,
                                     ),
-                                  );
-                                },
-                                child: const Text(
-                                  'Explorer',
-                                  style: TextStyle(fontSize: 11),
+                                    minimumSize: const Size(0, 32),
+                                    side: const BorderSide(
+                                      color: Color(0xFFE2E8F0),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            ProjectDocumentsScreen(
+                                              projectId: projectId,
+                                              projectName: projectName,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'Explorer',
+                                    style: TextStyle(
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF0F172A),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -189,59 +259,70 @@ class RecentAnalysesSection extends StatelessWidget {
         ),
         const SizedBox(width: 20),
 
-        // Documents générés
+        // Carte des documents types générés
         Expanded(
           flex: 4,
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withValues(alpha: 0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Documents générés',
+                    Text(
+                      'Documentation prête',
                       style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        'Voir tout →',
-                        style: TextStyle(fontSize: 12, color: Colors.black54),
-                      ),
+                    Icon(
+                      Icons.auto_awesome_rounded,
+                      size: 18,
+                      color: Color(0xFF64748B),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 6),
+                const Text(
+                  'Synthèses générées automatiquement à chaque analyse de code.',
+                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                ),
+                const SizedBox(height: 18),
                 _buildDocItem(
-                  'README.md',
-                  'ProjectLens',
-                  'Récemment',
-                  Icons.description,
-                  Colors.blue,
+                  'README & Démarrage',
+                  'Structure et prérequis',
+                  Icons.description_outlined,
+                  const Color(0xFF2563EB),
+                  const Color(0xFFDBEAFE),
                 ),
                 _buildDocItem(
-                  'Documentation API',
-                  'ProjectLens',
-                  'Récemment',
-                  Icons.article,
-                  Colors.red,
+                  'Spécification d\'API',
+                  'Endpoints REST & DTOs',
+                  Icons.api_rounded,
+                  const Color(0xFF059669),
+                  const Color(0xFFD1FAE5),
                 ),
                 _buildDocItem(
-                  'Diagramme de classes',
-                  'ProjectLens',
-                  'Récemment',
-                  Icons.account_tree,
-                  Colors.purple,
+                  'Diagrammes PlantUML',
+                  'Relations et classes',
+                  Icons.account_tree_outlined,
+                  const Color(0xFF7C3AED),
+                  const Color(0xFFEDE9FE),
                 ),
               ],
             ),
@@ -254,21 +335,27 @@ class RecentAnalysesSection extends StatelessWidget {
   Widget _buildDocItem(
     String title,
     String subtitle,
-    String time,
     IconData icon,
-    Color color,
+    Color iconColor,
+    Color bgColor,
   ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: bgColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, size: 18, color: color),
+            child: Icon(icon, size: 16, color: iconColor),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -278,27 +365,25 @@ class RecentAnalysesSection extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12.5,
+                    color: Color(0xFF0F172A),
                   ),
                 ),
                 Text(
                   subtitle,
-                  style: const TextStyle(color: Colors.grey, fontSize: 11),
+                  style: const TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                time,
-                style: const TextStyle(color: Colors.grey, fontSize: 10),
-              ),
-              const SizedBox(height: 2),
-              const Icon(Icons.download, size: 14, color: Colors.black54),
-            ],
+          const Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 12,
+            color: Color(0xFF94A3B8),
           ),
         ],
       ),

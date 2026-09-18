@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Importe tes providers
 import '../providers/project_provider.dart';
 import '../providers/user_provider.dart';
 
-// Importation de tes widgets existants et de ton écran "Mes projets"
 import '../widgets/home_sidebar.dart';
 import '../widgets/analysis_form_card.dart';
 import '../widgets/stats_cards_row.dart';
 import '../widgets/recent_analyses_section.dart';
-import '../screens/projects_screen.dart'; // <--- Importe ton écran "Mes projets"
+import '../screens/projects_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,9 +22,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _nameController = TextEditingController();
 
   String? _errorMessage;
-
-  // État pour suivre l'onglet actif dans la sidebar
   String _currentRoute = 'Tableau de bord';
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _nameController.dispose();
+    super.dispose();
+  }
 
   void _startAnalysis() async {
     setState(() {
@@ -38,7 +41,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     if (name.isEmpty || url.isEmpty) {
       setState(() {
-        _errorMessage = 'Veuillez remplir tous les champs.';
+        _errorMessage =
+            'Veuillez renseigner le nom du projet et l\'URL du dépôt.';
       });
       return;
     }
@@ -51,9 +55,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Projet analysé et importé avec succès !'),
-          backgroundColor: Colors.green,
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              SizedBox(width: 10),
+              Text('Dépôt importé et analysé avec succès !'),
+            ],
+          ),
+          backgroundColor: const Color(0xFF0F172A),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       );
     } catch (e) {
@@ -65,18 +79,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 1. On écoute le provider utilisateur
     final userAsync = ref.watch(userProvider);
     final userData =
-        userAsync.asData?.value ?? {'name': 'Utilisateur', 'email': '...'};
+        userAsync.asData?.value ?? {'name': 'Développeur', 'email': ''};
 
-    final String userName = userData['name'] ?? 'Utilisateur';
+    final String userName = userData['name'] ?? 'Développeur';
     final String userEmail = userData['email'] ?? '';
     final String firstName = userName.split(' ').first;
 
-    // 2. On écoute l'AsyncValue global des projets
     final projectAsync = ref.watch(projectProvider);
-
     final bool isLoading = projectAsync.isLoading;
     final List<dynamic> projects = projectAsync.asData?.value ?? [];
 
@@ -84,7 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       backgroundColor: const Color(0xFFF8FAFC),
       body: Row(
         children: [
-          // 1. Sidebar de gauche dynamique
+          // 1. Sidebar de gauche identique à la preview
           HomeSidebar(
             userName: userName,
             userEmail: userEmail,
@@ -96,31 +107,88 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             },
           ),
 
-          // 2. Contenu principal dynamique selon la route active
+          // 2. Contenu principal dynamique
           Expanded(
             child: _currentRoute == 'Mes projets'
-                ? const ProjectsScreen() // Affiche l'écran complet "Mes projets"
+                ? ProjectsScreen(
+                    onImportClick: () {
+                      setState(() => _currentRoute = 'Tableau de bord');
+                    },
+                  )
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.all(30),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 36,
+                      vertical: 32,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // En-tête de bienvenue
-                        Text(
-                          'Bonjour, $firstName 👋',
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Bonjour, $firstName 👋',
+                                  style: const TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w800,
+                                    color: Color(0xFF0F172A),
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  "Analysez, documentez et explorez l'architecture de vos projets.",
+                                  style: TextStyle(
+                                    color: Color(0xFF64748B),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF10B981),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${projects.length} projet${projects.length > 1 ? 's' : ''} actif${projects.length > 1 ? 's' : ''}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF334155),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        const Text(
-                          "Analysez et comprenez n'importe quel projet logiciel.",
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 28),
 
-                        // Formulaire d'analyse / import Git
+                        // Carte d'analyse / Import Git
                         AnalysisFormCard(
                           urlController: _urlController,
                           nameController: _nameController,
@@ -128,19 +196,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           errorMessage: _errorMessage,
                           onSubmit: _startAnalysis,
                         ),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 24),
 
-                        // Ligne des cartes de statistiques
+                        // Statistiques globales
                         const StatsCardsRow(),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 24),
 
-                        // Section des projets récents avec redirection vers "Mes projets"
+                        // Section des projets récents
                         RecentAnalysesSection(
                           projects: projects,
                           onViewAllPressed: () {
                             setState(() {
-                              _currentRoute =
-                                  'Mes projets'; // Change l'onglet actif
+                              _currentRoute = 'Mes projets';
                             });
                           },
                         ),
