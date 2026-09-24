@@ -10,6 +10,7 @@ import '../widgets/stats_cards_row.dart';
 import '../widgets/recent_analyses_section.dart';
 import '../screens/projects_screen.dart';
 import '../screens/import_project_screen.dart'; // <--- Import du nouvel écran
+import '../../../analysis/presentation/screens/database_analysis_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -98,6 +99,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             setState(() => _currentRoute = 'Mes projets');
           },
         );
+
+      case 'Diagrammes UML':
+      case 'Analyses':
+        return const DatabaseAnalysisScreen();
 
       case 'Tableau de bord':
       default:

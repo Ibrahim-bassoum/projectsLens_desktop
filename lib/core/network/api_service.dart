@@ -137,6 +137,24 @@ class ApiService {
     }
   }
 
+  Future<String> getDatabaseUmlDiagram(String projectId, {bool refresh = false}) async {
+    final token = await _getToken();
+    final url = '$baseUrl/ai/uml/$projectId?refresh=$refresh';
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        if (token != null) 'Authorization': 'Bearer $token',
+        'Accept': 'text/plain, application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Erreur génération diagramme UML : ${response.body}');
+    }
+  }
+
   Future<Map<String, dynamic>> getUserProfile() async {
     final token = await _getToken();
     if (token == null) throw Exception('Non authentifié');
