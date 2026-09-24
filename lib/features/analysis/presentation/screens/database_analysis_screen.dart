@@ -53,7 +53,7 @@ class _DatabaseAnalysisScreenState extends ConsumerState<DatabaseAnalysisScreen>
     final projectsAsync = ref.watch(projectProvider);
     final projects = projectsAsync.asData?.value ?? [];
 
-    // Si aucun projet n'est explicitement sélectionné, prendre le premier disponible
+    // Sélection par défaut du premier projet si non défini
     if (_selectedProjectId == null && projects.isNotEmpty) {
       _selectedProjectId = projects.first['id'].toString();
       _selectedProjectName = projects.first['name'] ?? 'Projet';
@@ -200,7 +200,7 @@ class _DatabaseAnalysisScreenState extends ConsumerState<DatabaseAnalysisScreen>
 
           const SizedBox(height: 20),
 
-          // 2. Si aucun projet n'existe dans l'espace de travail
+          // 2. Traitement si aucun projet n'existe ou affichage du schéma
           if (_selectedProjectId == null)
             Expanded(child: _buildNoProjectView())
           else
@@ -334,7 +334,7 @@ class _DatabaseAnalysisScreenState extends ConsumerState<DatabaseAnalysisScreen>
                   ),
                   const SizedBox(width: 16),
 
-                  // Barre de recherche de table
+                  // Barre de recherche
                   Container(
                     width: 200,
                     height: 36,
@@ -382,34 +382,41 @@ class _DatabaseAnalysisScreenState extends ConsumerState<DatabaseAnalysisScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // Onglet 1 : Grille des Entités
+                  // Onglet 1 : Grille des Entités (Disposition fluide dynamique sans overflow)
                   filteredEntities.isEmpty
                       ? _buildEmptyEntitiesView(schema.entities.isNotEmpty)
                       : LayoutBuilder(
                           builder: (context, constraints) {
+                            final availableWidth = constraints.maxWidth;
                             int crossAxisCount = 3;
-                            if (constraints.maxWidth < 950) {
+
+                            if (availableWidth < 950) {
                               crossAxisCount = 1;
-                            } else if (constraints.maxWidth < 1350) {
+                            } else if (availableWidth < 1350) {
                               crossAxisCount = 2;
                             }
 
-                            return GridView.builder(
+                            const double spacing = 16.0;
+                            final double cardWidth =
+                                (availableWidth -
+                                    ((crossAxisCount - 1) * spacing)) /
+                                crossAxisCount;
+
+                            return SingleChildScrollView(
                               padding: const EdgeInsets.only(bottom: 24),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: crossAxisCount,
-                                    crossAxisSpacing: 16,
-                                    mainAxisSpacing: 16,
-                                    mainAxisExtent: 320,
-                                  ),
-                              itemCount: filteredEntities.length,
-                              itemBuilder: (context, index) {
-                                return EntityCard(
-                                  entity: filteredEntities[index],
-                                  searchQuery: _searchTableQuery,
-                                );
-                              },
+                              child: Wrap(
+                                spacing: spacing,
+                                runSpacing: spacing,
+                                children: filteredEntities.map((entity) {
+                                  return SizedBox(
+                                    width: cardWidth,
+                                    child: EntityCard(
+                                      entity: entity,
+                                      searchQuery: _searchTableQuery,
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             );
                           },
                         ),

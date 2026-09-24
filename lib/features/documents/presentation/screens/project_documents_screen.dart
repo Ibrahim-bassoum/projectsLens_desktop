@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import '../providers/document_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/network/api_provider.dart';
+import '../providers/document_provider.dart';
 
 class ProjectDocumentsScreen extends ConsumerStatefulWidget {
   final String projectId;
@@ -40,7 +40,22 @@ class _ProjectDocumentsScreenState
     super.dispose();
   }
 
-  // Lancement de la génération via votre API Spring Boot
+  // Icône dynamique selon le titre du document
+  IconData _getIconForDoc(String title) {
+    final lower = title.toLowerCase();
+    if (lower.contains('architecture') || lower.contains('overview')) {
+      return Icons.account_tree_rounded;
+    } else if (lower.contains('api') || lower.contains('endpoint')) {
+      return Icons.api_rounded;
+    } else if (lower.contains('database') || lower.contains('bdd')) {
+      return Icons.storage_rounded;
+    } else if (lower.contains('guide') || lower.contains('install')) {
+      return Icons.menu_book_rounded;
+    }
+    return Icons.description_outlined;
+  }
+
+  // Lancement de la génération via l'API Spring Boot
   Future<void> _generateAnalysis() async {
     setState(() {
       isGenerating = true;
@@ -91,6 +106,47 @@ class _ProjectDocumentsScreenState
         setState(() {
           isGenerating = false;
         });
+      }
+    }
+  }
+
+  // Confirmation de suppression
+  Future<void> _confirmDeleteDoc(String docId, String title) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Supprimer le document'),
+        content: Text('Voulez-vous vraiment supprimer "$title" ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              'Supprimer',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await ref.read(apiServiceProvider).deleteDocument(docId);
+        ref.invalidate(projectDocumentsProvider(widget.projectId));
+        setState(() => selectedDocId = null);
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erreur lors de la suppression : $e')),
+          );
+        }
       }
     }
   }
@@ -243,10 +299,6 @@ class _ProjectDocumentsScreenState
             orElse: () => documents.first,
           );
 
-          if (!isEditing) {
-            _contentController.text = currentDoc.content;
-          }
-
           final filteredDocs = documents.where((d) {
             return d.title.toLowerCase().contains(
               _docSearchQuery.toLowerCase(),
@@ -267,7 +319,7 @@ class _ProjectDocumentsScreenState
                 ),
                 child: Column(
                   children: [
-                    // Barre de recherche de document
+                    // Barre de recherche
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Container(
@@ -572,7 +624,6 @@ class _ProjectDocumentsScreenState
                                     ),
                                   ),
                                 ] else ...[
-                                  // Bouton Copier
                                   IconButton(
                                     icon: const Icon(
                                       Icons.copy_rounded,
@@ -596,7 +647,6 @@ class _ProjectDocumentsScreenState
                                       );
                                     },
                                   ),
-                                  // Bouton Modifier
                                   IconButton(
                                     icon: const Icon(
                                       Icons.edit_outlined,
@@ -604,10 +654,14 @@ class _ProjectDocumentsScreenState
                                       color: Color(0xFF64748B),
                                     ),
                                     tooltip: 'Modifier',
-                                    onPressed: () =>
-                                        setState(() => isEditing = true),
+                                    onPressed: () {
+                                      setState(() {
+                                        _contentController.text =
+                                            currentDoc.content;
+                                        isEditing = true;
+                                      });
+                                    },
                                   ),
-                                  // Bouton Supprimer
                                   IconButton(
                                     icon: const Icon(
                                       Icons.delete_outline_rounded,
@@ -735,12 +789,12 @@ class _ProjectDocumentsScreenState
               children: [
                 const Icon(
                   Icons.error_outline_rounded,
-                  size: 42,
+                  size: 40,
                   color: Color(0xFFDC2626),
                 ),
                 const SizedBox(height: 14),
                 const Text(
-                  'Erreur lors du chargement des documents',
+                  'Échec du chargement de la documentation',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 16,
@@ -751,17 +805,13 @@ class _ProjectDocumentsScreenState
                 Text(
                   '$err',
                   style: const TextStyle(
-                    color: Color(0xFF64748B),
                     fontSize: 13,
+                    color: Color(0xFF64748B),
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 18),
                 ElevatedButton.icon(
-                  onPressed: () =>
-                      ref.refresh(projectDocumentsProvider(widget.projectId)),
-                  icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('Réessayer'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0F172A),
                     foregroundColor: Colors.white,
@@ -769,6 +819,10 @@ class _ProjectDocumentsScreenState
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
+                  onPressed: () =>
+                      ref.refresh(projectDocumentsProvider(widget.projectId)),
+                  icon: const Icon(Icons.refresh_rounded, size: 16),
+                  label: const Text('Réessayer'),
                 ),
               ],
             ),
@@ -778,134 +832,54 @@ class _ProjectDocumentsScreenState
     );
   }
 
-  // État vide
+  // État d'absence de document
   Widget _buildEmptyState() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 60,
-            height: 60,
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: const Color(0xFFF1F5F9),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
-              Icons.description_outlined,
-              size: 30,
+              Icons.article_outlined,
+              size: 40,
               color: Color(0xFF94A3B8),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           const Text(
-            'Aucun document généré',
+            'Aucune documentation générée',
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 17,
               fontWeight: FontWeight.w700,
               color: Color(0xFF0F172A),
             ),
           ),
           const SizedBox(height: 6),
           const Text(
-            'Lancez l\'analyse pour générer automatiquement le README, les spécifications et diagrammes.',
+            'Lancer l\'analyse avec l\'IA pour créer la documentation automatique du projet.',
             style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
           ),
-          const SizedBox(height: 22),
+          const SizedBox(height: 20),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF0F172A),
               foregroundColor: Colors.white,
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: isGenerating ? null : _generateAnalysis,
-            icon: isGenerating
-                ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Icon(Icons.auto_awesome_rounded, size: 16),
-            label: Text(
-              isGenerating
-                  ? 'Génération en cours...'
-                  : "Générer la documentation",
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Dialogue de confirmation de suppression
-  void _confirmDeleteDoc(String docId, String title) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Supprimer le document',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-        ),
-        content: Text('Voulez-vous vraiment supprimer "$title" ?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Annuler',
-              style: TextStyle(color: Color(0xFF64748B)),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFDC2626),
-              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Supprimer',
-              style: TextStyle(color: Colors.white),
-            ),
+            onPressed: isGenerating ? null : _generateAnalysis,
+            icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+            label: const Text('Générer la documentation'),
           ),
         ],
       ),
     );
-
-    if (confirm == true) {
-      try {
-        await ref.read(apiServiceProvider).deleteDocument(docId);
-        setState(() => selectedDocId = null);
-        ref.invalidate(projectDocumentsProvider(widget.projectId));
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Erreur : $e'), backgroundColor: Colors.red),
-          );
-        }
-      }
-    }
-  }
-
-  // Attribution d'icônes selon le type de doc
-  IconData _getIconForDoc(String title) {
-    final t = title.toLowerCase();
-    if (t.contains('readme')) return Icons.menu_book_rounded;
-    if (t.contains('api') || t.contains('endpoint')) return Icons.api_rounded;
-    if (t.contains('diagram') || t.contains('uml') || t.contains('classe'))
-      return Icons.account_tree_outlined;
-    if (t.contains('archi')) return Icons.hub_outlined;
-    return Icons.article_outlined;
   }
 }

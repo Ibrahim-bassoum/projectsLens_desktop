@@ -12,35 +12,39 @@ class MermaidGraphView extends StatefulWidget {
 
 class _MermaidGraphViewState extends State<MermaidGraphView> {
   final TransformationController _transController = TransformationController();
-  double _scale = 1.0;
 
+  /// Génère l'URL d'image pour mermaid.ink
+  /// Note : Utilisation de /img/ (PNG) au lieu de /svg/ car Image.network ne supporte pas le SVG natif.
   String _getMermaidInkUrl(String code) {
-    // Encapsulation dans la structure JSON attendue par mermaid.ink
     final jsonSpec = jsonEncode({
       'code': code,
-      'mermaid': {'theme': 'default'},
+      'mermaid': {
+        'theme': 'default',
+        'themeVariables': {'fontFamily': 'Inter, sans-serif'},
+      },
     });
     final base64Spec = base64UrlEncode(utf8.encode(jsonSpec));
-    return 'https://mermaid.ink/svg/$base64Spec';
+    // Utilisation du format PNG haute définition
+    return 'https://mermaid.ink/img/$base64Spec?bgColor=transparent';
   }
 
-  void _zoomIn() {
-    setState(() {
-      _scale = (_scale + 0.25).clamp(0.5, 4.0);
-      _transController.value = Matrix4.identity()..scale(_scale);
-    });
-  }
+  void _zoom(double factor) {
+    final Matrix4 currentMatrix = _transController.value;
+    final double currentScale = currentMatrix.getMaxScaleOnAxis();
+    final double targetScale = (currentScale * factor).clamp(0.3, 5.0);
+    final double scaleFactor = targetScale / currentScale;
 
-  void _zoomOut() {
     setState(() {
-      _scale = (_scale - 0.25).clamp(0.5, 4.0);
-      _transController.value = Matrix4.identity()..scale(_scale);
+      _transController.value = currentMatrix.scaled(
+        scaleFactor,
+        scaleFactor,
+        1.0,
+      );
     });
   }
 
   void _resetZoom() {
     setState(() {
-      _scale = 1.0;
       _transController.value = Matrix4.identity();
     });
   }
@@ -70,20 +74,18 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
       ),
       child: Stack(
         children: [
-          // Grille d'arrière-plan technique
+          // 1. Arrière-plan grille
           Positioned.fill(
-            child: CustomPaint(
-              painter: _GridBackgroundPainter(),
-            ),
+            child: CustomPaint(painter: _GridBackgroundPainter()),
           ),
 
-          // Zone Interactive (Zoom & Pan)
+          // 2. Zone Interactive (Zoom & Pan)
           Positioned.fill(
             child: InteractiveViewer(
               transformationController: _transController,
               minScale: 0.3,
               maxScale: 5.0,
-              boundaryMargin: const EdgeInsets.all(500),
+              boundaryMargin: const EdgeInsets.all(800),
               child: Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32.0),
@@ -94,7 +96,9 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                       if (loadingProgress == null) return child;
                       final expected = loadingProgress.expectedTotalBytes;
                       final current = loadingProgress.cumulativeBytesLoaded;
-                      final percent = expected != null ? (current / expected) : null;
+                      final percent = expected != null
+                          ? (current / expected)
+                          : null;
 
                       return Center(
                         child: Column(
@@ -103,12 +107,16 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                             CircularProgressIndicator(
                               value: percent,
                               color: const Color(0xFF0F172A),
-                              strokeWidth: 2,
+                              strokeWidth: 2.5,
                             ),
                             const SizedBox(height: 12),
                             const Text(
-                              'Rendu vectoriel du diagramme...',
-                              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                              'Génération du rendu du diagramme...',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color(0xFF64748B),
+                              ),
                             ),
                           ],
                         ),
@@ -121,16 +129,28 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.broken_image_rounded, size: 36, color: Color(0xFF94A3B8)),
+                              const Icon(
+                                Icons
+                                    .signal_wifi_connected_no_internet_4_rounded,
+                                size: 38,
+                                color: Color(0xFF94A3B8),
+                              ),
                               const SizedBox(height: 12),
                               const Text(
-                                'Aperçu vectoriel non disponible hors ligne.',
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Color(0xFF0F172A)),
+                                'Aperçu du schéma indisponible',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: Color(0xFF0F172A),
+                                ),
                               ),
                               const SizedBox(height: 4),
                               const Text(
-                                'Consultez le "Schéma Relationnel" ou le "Code Mermaid" dans les onglets ci-dessus.',
-                                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                'Vérifiez votre connexion internet ou le volume du code Mermaid.\nUtilisez les onglets "Schéma Relationnel" ou "Code Mermaid".',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF64748B),
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -144,7 +164,7 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
             ),
           ),
 
-          // Boutons de contrôle de zoom flottants
+          // 3. Boutons de contrôle de zoom
           Positioned(
             right: 16,
             bottom: 16,
@@ -156,7 +176,7 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF0F172A).withValues(alpha: 0.05),
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -166,14 +186,14 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.zoom_in_rounded, size: 18),
-                    onPressed: _zoomIn,
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    onPressed: () => _zoom(1.25),
                     tooltip: 'Zoomer (+)',
                     visualDensity: VisualDensity.compact,
                   ),
                   IconButton(
-                    icon: const Icon(Icons.zoom_out_rounded, size: 18),
-                    onPressed: _zoomOut,
+                    icon: const Icon(Icons.remove_rounded, size: 18),
+                    onPressed: () => _zoom(0.8),
                     tooltip: 'Dézoomer (-)',
                     visualDensity: VisualDensity.compact,
                   ),
@@ -184,9 +204,12 @@ class _MermaidGraphViewState extends State<MermaidGraphView> {
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.center_focus_strong_rounded, size: 18),
+                    icon: const Icon(
+                      Icons.center_focus_strong_rounded,
+                      size: 18,
+                    ),
                     onPressed: _resetZoom,
-                    tooltip: 'Réinitialiser le zoom (100%)',
+                    tooltip: 'Réinitialiser la vue (100%)',
                     visualDensity: VisualDensity.compact,
                   ),
                 ],
